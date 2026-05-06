@@ -2,6 +2,7 @@ const { Sequelize } = require('sequelize');
 const path = require('path');
 
 const dialect = process.env.DB_DIALECT || 'mysql';
+const useSsl = process.env.DB_SSL === 'true';
 
 const sequelize =
   dialect === 'sqlite'
@@ -23,11 +24,19 @@ const sequelize =
             underscored: true
           },
           pool: {
-            max: 10,
-            min: 0,
-            acquire: 30000,
-            idle: 10000
-          }
+            max: Number(process.env.DB_POOL_MAX || 10),
+            min: Number(process.env.DB_POOL_MIN || 0),
+            acquire: Number(process.env.DB_POOL_ACQUIRE || 30000),
+            idle: Number(process.env.DB_POOL_IDLE || 10000)
+          },
+          dialectOptions: useSsl
+            ? {
+                ssl: {
+                  require: true,
+                  rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false'
+                }
+              }
+            : {}
         }
       );
 

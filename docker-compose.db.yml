@@ -1,0 +1,22 @@
+services:
+  hospitalx-mysql:
+    image: mysql:8.4
+    container_name: hospitalx-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: hospitalx_suite
+      MYSQL_USER: hospitalx_app
+      MYSQL_PASSWORD: change_me_app_password
+      MYSQL_ROOT_PASSWORD: change_me_root_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - hospitalx_mysql_data:/var/lib/mysql
+      - ./backend/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./backend/database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --bind-address=0.0.0.0
+
+volumes:
+  hospitalx_mysql_data:
