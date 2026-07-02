@@ -5,7 +5,7 @@ import Toast from '../components/Toast';
 import { doctors } from '../data/hospitalData';
 import { apiRequest } from '../services/api';
 
-const Appointment = () => {
+const Appointment = ({ user }) => {
   const [form, setForm] = useState({ doctor_id: doctors[0].id, date: '', notes: '' });
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState('');
@@ -33,9 +33,15 @@ const Appointment = () => {
           title="Request a visit with the right specialist"
           description="Patients can submit appointment requests securely. Admins and doctors can confirm, update, or cancel appointments through protected APIs."
         />
-        <div className="rounded-lg border border-blue-100 bg-blue-50 p-5 text-sm leading-6 text-blue-900">
-          Sign in first to book through the live API. The form still shows the complete booking workflow and validation states.
-        </div>
+        {user ? (
+          <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-5 text-sm leading-6 text-emerald-900">
+            Logged in as <strong className="text-emerald-955">{user.name}</strong> ({user.role}). You are authorized to submit appointment requests.
+          </div>
+        ) : (
+          <div className="rounded-lg border border-blue-100 bg-blue-50 p-5 text-sm leading-6 text-blue-900">
+            Please sign in first to book appointments through the API.
+          </div>
+        )}
       </section>
       <form onSubmit={handleSubmit} className="card grid gap-5 p-6 sm:p-8">
         <div className="flex items-center gap-3">

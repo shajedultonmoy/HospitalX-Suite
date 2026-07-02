@@ -11,7 +11,7 @@ const navItems = [
   { label: 'Contact', to: '/contact' },
 ];
 
-const Navbar = () => {
+const Navbar = ({ user, onLogout }) => {
   const [open, setOpen] = useState(false);
   const linkClass = ({ isActive }) =>
     `rounded-lg px-3 py-2 text-sm font-medium transition ${isActive ? 'bg-blue-50 text-primary' : 'text-slate-600 hover:bg-slate-50 hover:text-primary'}`;
@@ -32,13 +32,27 @@ const Navbar = () => {
                 {item.label}
               </NavLink>
             ))}
+            {user && user.role === 'Admin' && (
+              <NavLink to="/admin" className={linkClass}>
+                Dashboard
+              </NavLink>
+            )}
           </div>
           <div className="hidden items-center gap-3 lg:flex">
             <Link to="/appointments" className="btn-primary py-2">
               <CalendarPlus className="h-4 w-4" />
               Book
             </Link>
-            <Link to="/login" className="btn-secondary py-2">Login</Link>
+            {user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-slate-700">
+                  {user.name} ({user.role})
+                </span>
+                <button onClick={onLogout} className="btn-secondary py-2">Logout</button>
+              </div>
+            ) : (
+              <Link to="/login" className="btn-secondary py-2">Login</Link>
+            )}
           </div>
           <button className="rounded-lg p-2 text-slate-700 hover:bg-slate-100 lg:hidden" onClick={() => setOpen(!open)} aria-label="Toggle menu">
             {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -52,13 +66,29 @@ const Navbar = () => {
                   {item.label}
                 </NavLink>
               ))}
+              {user && user.role === 'Admin' && (
+                <NavLink to="/admin" className={linkClass} onClick={() => setOpen(false)}>
+                  Dashboard
+                </NavLink>
+              )}
               <Link to="/appointments" onClick={() => setOpen(false)} className="btn-primary mt-2">
                 <CalendarPlus className="h-4 w-4" />
                 Book Appointment
               </Link>
-              <Link to="/login" onClick={() => setOpen(false)} className="btn-secondary">
-                Login
-              </Link>
+              {user ? (
+                <div className="grid gap-2 mt-2 px-3 py-2 border-t border-slate-100">
+                  <span className="text-sm font-medium text-slate-600">
+                    Logged in as: <strong className="text-slate-900">{user.name}</strong> ({user.role})
+                  </span>
+                  <button onClick={() => { onLogout(); setOpen(false); }} className="btn-secondary w-full text-center">
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <Link to="/login" onClick={() => setOpen(false)} className="btn-secondary">
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         )}

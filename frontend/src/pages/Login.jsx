@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Toast from '../components/Toast';
 import { apiRequest } from '../services/api';
 
-const Login = () => {
+const Login = ({ onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'Patient' });
   const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +19,9 @@ const Login = () => {
       const data = await apiRequest(endpoint, { method: 'POST', body: JSON.stringify(formData) });
       localStorage.setItem('token', data.token);
       localStorage.setItem('hospitalx_user', JSON.stringify(data.user));
+      if (onLoginSuccess) {
+        onLoginSuccess(data.user);
+      }
       setToast(isLogin ? 'Signed in successfully.' : 'Account created successfully.');
       setTimeout(() => navigate('/'), 700);
     } catch (err) {

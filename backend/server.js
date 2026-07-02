@@ -38,8 +38,22 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 // Sync Database and Start Server
-sequelize.sync({ alter: process.env.DB_SYNC_ALTER !== 'false' }).then(() => {
+sequelize.sync({ alter: process.env.DB_SYNC_ALTER !== 'false' }).then(async () => {
   console.log(`Database connected and synced (Mode: ${process.env.NODE_ENV || 'development'})`);
+  
+  // Auto-seed if database has no users
+  try {
+    const { User } = require('./models');
+    const userCount = await User.count();
+    if (userCount === 0) {
+      console.log('🌱 Database is empty. Running auto-seed...');
+      const seedDatabase = require('./seed-runner');
+      await seedDatabase();
+    }
+  } catch (seedErr) {
+    console.error('⚠️ Auto-seed failed:', seedErr);
+  }
+
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
